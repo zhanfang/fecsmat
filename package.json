@@ -1,0 +1,51 @@
+{
+    "name": "fecsmat",
+    "displayName": "fecsmat",
+    "description": "A fecs format extension",
+    "version": "0.0.1",
+    "publisher": "zhanfang",
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.format"
+    ],
+    "main": "./src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.format",
+                "title": "fecs format"
+            },
+            {
+                "command": "extension.sayHello",
+                "title": "hello world"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.format",
+                "key": "cmd+shift+r"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "eslint": "^3.6.0",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "fecs": "^1.4.1",
+        "vinyl": "^2.1.0"
+    }
+}

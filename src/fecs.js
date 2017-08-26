@@ -5,76 +5,75 @@
 'use strict';
 
 const Readable = require('stream').Readable;
-const fecs = require('fecs');
+const fecs = require('../fecs');
 const File = require('vinyl');
 const vscode = require('vscode');
-const {alertMsg} = require('./utils');
+const {alertMsg, checkEditor} = require('./utils');
 const config = require('./config');
 
 const {window} = vscode;
 
-exports.helloWorld = function () {
-    alertMsg('info', 'Hello World!');
-};
 
 exports.format = function () {
-    if (!window.activeTextEditor) {
-        alertMsg('warn', '无可用文本用于格式化');
-        return;
-    }
-
     const editor = window.activeTextEditor;
-    const fileName = editor.document.fileName;
-    let fileType;
-
-    if (fileName) {
-        let matchArry = fileName.match(/.*\.(.*)$/);
-        if (matchArry !== null) {
-            fileType = matchArry[1].toLowerCase();
-        }
-    }
-
-    if (
-        fileType === 'js'
-        || fileType === 'es'
-        || fileType === 'html'
-        || fileType === 'css'
-        || fileType === 'less'
-        || fileType === 'jsx'
-        || fileType === 'vue'
-    ) {
+    if (checkEditor(editor)) {
         runFecsFormat(editor);
     }
-
 };
 
-function runFecsFormat(editor) {
-    if (!editor || !editor.document) {
-        return;
+exports.check = function () {
+    const editor = window.activeTextEditor;
+    if (checkEditor(editor)) {
+        runFecsCheck(editor);
     }
+}
 
+function runFecsCheck(editor) {
     let code = editor.document.getText();
     let stream = createCodeStream(code, editor.document.fileName);
-    console.log(stream);
-    let bufData = [];
-    fecs.format({
-        lookup: true,
-        stream: stream,
-        reporter: 'baidu',
-        level: 0
-    }).on('data', function (file) {
-        console.log(file.contents);
-        bufData = bufData.concat(file.contents);
-    }).on('end', function () {
-        console.log('end');
-        let startPos = new vscode.Position(0, 0);
-        let endPos = new vscode.Position(editor.document.lineCount, 0);
-        let range = new vscode.Range(startPos, endPos);
-
-        vscode.window.activeTextEditor.edit(editBuilder => {
-            editBuilder.replace(range, bufData.toString('utf8'));
+    
+    try {
+        fecs.check({
+            lookup: true,
+            stream: stream,
+            reporter: config.en ? '' : 'baidu',
+            level: config.level
+        }, function (success, json) {
+            let errors = (json[0] || {}).errors || [];
+            prepareErrors(errors, editor);
+            renderErrors(editor);
         });
-    });
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+function runFecsFormat(editor) {
+    let code = editor.document.getText();
+    let stream = createCodeStream(code, editor.document.fileName);
+    let bufData = [];
+
+    try {
+        fecs.format({
+            lookup: true,
+            stream: stream,
+            reporter: 'baidu',
+            level: 0
+        }).on('data', function (file) {
+            bufData = bufData.concat(file.contents);
+        }).on('end', function () {
+            let startPos = new vscode.Position(0, 0);
+            let endPos = new vscode.Position(editor.document.lineCount, 0);
+            let range = new vscode.Range(startPos, endPos);
+
+            vscode.window.activeTextEditor.edit(editBuilder => {
+                editBuilder.replace(range, bufData.toString('utf8'));
+            });
+        });
+    } catch (err) {
+        alertMsg('error', err.message);
+        console.error(err)
+    }
 }
 
 function createCodeStream(code = '', filePath = '') {
@@ -95,3 +94,5 @@ function createCodeStream(code = '', filePath = '') {
     };
     return stream;
 }
+
+

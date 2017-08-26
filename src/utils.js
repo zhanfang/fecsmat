@@ -50,3 +50,25 @@ exports.checkEditor = function (editor) {
 
     return false;
 };
+
+exports.generateEditorFecsData = function(editor, editorFecsDataMap) {
+    if (!editor || editorFecsDataMap.has(editor.id)) {
+        return;
+    }
+
+    let fileName = editor.document ? editor.document.fileName : '';
+
+    editorFecsDataMap.set(editor.id, {
+        fileName: fileName,
+        oldDecorationTypeList: [],
+        delayTimer: null,
+        isRunning: false,
+        needCheck: true,
+        errorMap: null,
+        diagnostics: [],
+        warningDecorationList: [],
+        errorDecorationList: []
+    });
+
+    return editorFecsDataMap.get(editor.id);
+}

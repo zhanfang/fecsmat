@@ -2,7 +2,7 @@
     "name": "fecsmat",
     "displayName": "fecsmat",
     "description": "A fecs format extension",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "zhanfang",
     "engines": {
         "vscode": "^1.5.0"
@@ -11,18 +11,66 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.format"
+        "*"
     ],
     "main": "./src/extension",
     "contributes": {
+        "configuration": {
+            "title": "fecsmat configuration",
+            "properties": {
+                "fecsmat.level": {
+                    "default": 0,
+                    "title": "Fecs check level",
+                    "type": "number",
+                    "description": "Fecs check level. Value is 0 1 or 2"
+                },
+                "fecsmat.en": {
+                    "default": false,
+                    "title": "Fecs output language",
+                    "type": "boolean",
+                    "description": "Fecs language. Value is true or false"
+                },
+                "fecsmat.errorColor": {
+                    "default": "#f00",
+                    "title": "Fecs check error line color",
+                    "type": "string",
+                    "description": "Fecs check error line color"
+                },
+                "fecsmat.warnColor": {
+                    "default": "#ddb700",
+                    "title": "Fecs check warn line color",
+                    "type": "string",
+                    "description": "Fecs check warn line color"
+                },
+                "fecsmat.excludePaths": {
+                    "default": [
+                        "dist",
+                        "output",
+                        "node_modules"
+                    ],
+                    "title": "Fecs will not check the dirs",
+                    "type": "array",
+                    "description": "Fecs will not check the dirs"                    
+                },
+                "fecsmat.jsLikeExt": {
+                    "default": [
+                      "js",
+                      "jsx",
+                      "es",
+                      "es6",
+                      "vue",
+                      "san"
+                    ],
+                    "title": "Fecs files with these extensions",
+                    "type": "array",
+                    "description": "Specified 'js like' files extension that can use fecs."
+                }
+            }
+        },
         "commands": [
             {
                 "command": "extension.format",
                 "title": "fecs format"
-            },
-            {
-                "command": "extension.sayHello",
-                "title": "hello world"
             }
         ],
         "keybindings": [

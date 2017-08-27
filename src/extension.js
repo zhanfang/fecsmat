@@ -4,9 +4,8 @@
  */
 'use strict';
 
-const {alertMsg} = require('./utils');
 const vscode = require('vscode');
-const {format, check} = require('./fecs');
+const {format, check, showMsg} = require('./fecs');
 
 function registerFormat(context) {
     const disposable = vscode.commands.registerCommand('extension.format', format);
@@ -20,28 +19,37 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    
-    //编辑文档后触发(coding...)
+
+    // 编辑文档后触发(coding...)
     vscode.workspace.onDidChangeTextDocument(function (event) {
         let editor = vscode.window.activeTextEditor;
-        let document = event.document;
-        vscode.window.visibleTextEditors.filter(e =>
-            e.document && e.document.fileName === document.fileName
-        ).forEach(e => {
-            check(editor, context);
-        });
+        check(editor, context);
     });
 
     // 切换文件 tab 后触发
     vscode.window.onDidChangeActiveTextEditor(function (editor) {
         check(editor, context);
     });
-    
-    // vscode.window.visibleTextEditors.forEach(function (editor, i) {
-    //     if(editor) {
-    //         check(editor, context);
-    //     }
-    // });
+
+    // 光标移动后触发
+    vscode.window.onDidChangeTextEditorSelection(function (event) {
+
+        if (!event.textEditor || !event.textEditor.document) {
+            return;
+        }
+
+        if (event.textEditor === vscode.window.activeTextEditor) {
+            showMsg(event.textEditor);
+        }
+
+    });
+
+    vscode.window.visibleTextEditors.forEach(function (editor, i) {
+        if (editor) {
+            check(editor, context);
+        }
+
+    });
 
     registerFormat(context);
 }

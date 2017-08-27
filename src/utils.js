@@ -36,17 +36,11 @@ exports.checkEditor = function (editor) {
     const fileName = editor.document.fileName;
     const fileType = fileName.split('.').pop();
 
-    if (
-        fileType === 'js'
-        || fileType === 'es'
-        || fileType === 'html'
-        || fileType === 'css'
-        || fileType === 'less'
-        || fileType === 'jsx'
-        || fileType === 'vue'
-    ) {
-        return true;
-    }
+    config.fileType.forEach(item => {
+        if(item === fileType) {
+            return true;
+        }
+    });
 
     return false;
 };

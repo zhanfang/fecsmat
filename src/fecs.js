@@ -15,10 +15,12 @@ const {
 } = require('./utils');
 const config = require('./config');
 
-const {window} = vscode;
+const {window, languages} = vscode;
 let editorFecsDataMap = new Map();
+let diagnosticCollection = languages.createDiagnosticCollection('fecs');
 let errorIconPath = null;
 let warnIconPath = null;
+let statusBarItem = null;
 
 exports.format = function () {
     const editor = window.activeTextEditor;
@@ -35,10 +37,17 @@ exports.check = function (editor, context) {
     }
 
     if (checkEditor(editor)) {
+        diagnosticCollection.clear();
         runFecsCheck(editor);
     }
-
 };
+
+exports.showMsg = function () {
+    if (checkEditor(editor)) {
+        diagnosticCollection.clear();
+        showErrorMessageInStatusBar(editor);
+    }
+}
 
 function runFecsCheck(editor) {
     let code = editor.document.getText();
@@ -140,6 +149,28 @@ function renderErrors(editor) {
     } = editorFecsData;
     decorateEditor(editor, errorDecorationList, 'error', oldDecorationTypeList);
     decorateEditor(editor, warningDecorationList, 'warning', oldDecorationTypeList);
+
+    showErrorMessageInStatusBar(editor);
+    showDiagnostics(editor);
+}
+
+// hover显示错误信息
+function showDiagnostics(editor) {
+    let editorFecsData = editorFecsDataMap.get(editor.id);
+
+    if (!editorFecsData) {
+        return;
+    }
+
+    let uri = editor.document.uri;
+    let diagnostics = editorFecsData.diagnostics;
+
+    if (window.activeTextEditor !== editor) {
+        diagnosticCollection.delete(uri);
+        return;
+    }
+
+    diagnosticCollection.set(uri, diagnostics);
 }
 
 function decorateEditor(editor, list, type, oldDecorationTypeList) {
@@ -164,6 +195,29 @@ function generateDecorationType(type = 'warning') {
         gutterIconSize: 'contain',
         overviewRulerColor: rulerColor
     });
+}
+
+function showErrorMessageInStatusBar(editor) {
+    let selection = editor.selection;
+    let line = selection.start.line; // 只显示选区第一行的错误信息
+    let editorFecsData = editorFecsDataMap.get(editor.id);
+    let errorMap = editorFecsData.errorMap;
+    let errList = [];
+
+    if (errorMap && errorMap.has(line)) {
+        errList = errorMap.get(line);
+    }
+
+    if (!statusBarItem) {
+        statusBarItem = window.createStatusBarItem(1);
+        statusBarItem.show();
+    }
+
+    let showErr = errList[0] || {msg: '', severity: 0};
+
+    statusBarItem.text = showErr.msg;
+    statusBarItem.color = showErr.severity === 2 ? config.errorColor : config.warnColor;
+    statusBarItem.tooltip = 'fecs:\n\n' + errList.map(err => err.msg).join('\n\n');
 }
 
 function runFecsFormat(editor) {

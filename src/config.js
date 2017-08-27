@@ -8,11 +8,12 @@ const vscode = require('vscode');
 const vsConfig = vscode.workspace.getConfiguration('fecsmat');
 
 exports = {
-    en: vsConfig.get("en"),
-    level: vsConfig.get("level"),
-    errorColor: vsConfig.get("errorColor"),
-    warnColor: vsConfig.get("warnColor"),
+    en: vsConfig.get('en'),
+    level: vsConfig.get('level'),
+    errorColor: vsConfig.get('errorColor'),
+    warnColor: vsConfig.get('warnColor'),
     typeMap: new Map(),
+    fileType: vsConfig.get('fileType'),
     excludePaths: vsConfig.get('excludePaths'),
     excludeFileNameSuffixes: []
 };

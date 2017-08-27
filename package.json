@@ -2,7 +2,7 @@
     "name": "fecsmat",
     "displayName": "fecsmat",
     "description": "A fecs format extension",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "zhanfang",
     "engines": {
         "vscode": "^1.5.0"
@@ -60,6 +60,19 @@
                       "es6",
                       "vue",
                       "san"
+                    ],
+                    "title": "Fecs files with these extensions",
+                    "type": "array",
+                    "description": "Specified 'js like' files extension that can use fecs."
+                },
+                "fecsmat.fileType": {
+                    "default": [
+                      "js",
+                      "es",
+                      "css",
+                      "less",
+                      "html",
+                      "vue"
                     ],
                     "title": "Fecs files with these extensions",
                     "type": "array",

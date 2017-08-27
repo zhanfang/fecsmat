@@ -8,14 +8,26 @@ const Readable = require('stream').Readable;
 const fecs = require('../fecs');
 const File = require('vinyl');
 const vscode = require('vscode');
+const {window, languages} = vscode;
 const {
     alertMsg,
     checkEditor,
     generateEditorFecsData
 } = require('./utils');
-const config = require('./config');
 
-const {window, languages} = vscode;
+// 插件配置属性
+const vsConfig = vscode.workspace.getConfiguration('fecsmat');
+const config = {
+    en: vsConfig.get('en'),
+    level: vsConfig.get('level'),
+    errorColor: vsConfig.get('errorColor'),
+    warnColor: vsConfig.get('warnColor'),
+    typeMap: new Map(),
+    fileTypes: vsConfig.get('fileTypes'),
+    excludePaths: vsConfig.get('excludePaths'),
+    excludeFileNameSuffixes: []
+};
+
 let editorFecsDataMap = new Map();
 let diagnosticCollection = languages.createDiagnosticCollection('fecs');
 let errorIconPath = null;
@@ -24,7 +36,7 @@ let statusBarItem = null;
 
 exports.format = function () {
     const editor = window.activeTextEditor;
-    if (checkEditor(editor)) {
+    if (checkEditor(editor, config.fileTypes)) {
         runFecsFormat(editor);
     }
 
@@ -36,14 +48,14 @@ exports.check = function (editor, context) {
         warnIconPath = context.asAbsolutePath('images/warning.svg');
     }
 
-    if (checkEditor(editor)) {
+    if (checkEditor(editor, config.fileTypes)) {
         diagnosticCollection.clear();
         runFecsCheck(editor);
     }
 };
 
 exports.showMsg = function () {
-    if (checkEditor(editor)) {
+    if (checkEditor(editor, config.fileTypes)) {
         diagnosticCollection.clear();
         showErrorMessageInStatusBar(editor);
     }

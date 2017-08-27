@@ -27,7 +27,7 @@ exports.alertMsg = function (type, msg) {
 /**
  * 检测当前editor是否可以被fecs应用
  */
-exports.checkEditor = function (editor) {
+exports.checkEditor = function (editor, fileTypes) {
     if (!editor) {
         alertMsg('warn', '无可用文本用于格式化');
         return false;
@@ -36,11 +36,13 @@ exports.checkEditor = function (editor) {
     const fileName = editor.document.fileName;
     const fileType = fileName.split('.').pop();
 
-    config.fileType.forEach(item => {
-        if(item === fileType) {
-            return true;
-        }
+    const result = fileTypes.filter(item => {
+        return item === fileType;
     });
+
+    if(result.length === 1) {
+        return true;
+    }
 
     return false;
 };

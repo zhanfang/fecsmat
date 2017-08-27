@@ -40,14 +40,14 @@ exports.checkEditor = function (editor, fileTypes) {
         return item === fileType;
     });
 
-    if(result.length === 1) {
+    if (result.length === 1) {
         return true;
     }
 
     return false;
 };
 
-exports.generateEditorFecsData = function(editor, editorFecsDataMap) {
+exports.generateEditorFecsData = function (editor, editorFecsDataMap) {
     if (!editor || editorFecsDataMap.has(editor.id)) {
         return;
     }
@@ -67,4 +67,4 @@ exports.generateEditorFecsData = function(editor, editorFecsDataMap) {
     });
 
     return editorFecsDataMap.get(editor.id);
-}
+};

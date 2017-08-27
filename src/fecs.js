@@ -52,14 +52,16 @@ exports.check = function (editor, context) {
         diagnosticCollection.clear();
         runFecsCheck(editor);
     }
+
 };
 
-exports.showMsg = function () {
+exports.showMsg = function (editor) {
     if (checkEditor(editor, config.fileTypes)) {
         diagnosticCollection.clear();
         showErrorMessageInStatusBar(editor);
     }
-}
+
+};
 
 function runFecsCheck(editor) {
     let code = editor.document.getText();
@@ -234,14 +236,22 @@ function showErrorMessageInStatusBar(editor) {
 
 function runFecsFormat(editor) {
     let code = editor.document.getText();
-    let stream = createCodeStream(code, editor.document.fileName);
+    let fileName = editor.document.fileName;
+    let fileType = fileName.split('.').pop();
+
+    if (fileType === 'san' || fileType === 'vue') {
+        formatSanOrVue(editor);
+        return;
+    }
+
+    let stream = createCodeStream(code, fileName);
     let bufData = [];
 
     try {
         fecs.format({
             lookup: true,
             stream: stream,
-            reporter: 'baidu',
+            reporter: 'none',
             level: 0
         }).on('data', function (file) {
             bufData = bufData.concat(file.contents);
@@ -254,6 +264,49 @@ function runFecsFormat(editor) {
                 editBuilder.replace(range, bufData.toString('utf8'));
             });
         });
+    }
+    catch (err) {
+        alertMsg('error', err.message);
+        console.error(err);
+    }
+}
+
+function formatSanOrVue(editor) {
+    let code = editor.document.getText();
+
+    let template = code.match(/\<template(.*)\>([\s\S]+)\<\/template\>/);
+    let script = code.match(/\<script(.*)\>([\s\S]+)\<\/script\>/);
+    let style = code.match(/\<style(.*)\>([\s\S]+)\<\/style\>/);
+
+    try {
+        let stream = createCodeStream(script[2], 'current-file.js');
+        let bufData = [];
+        fecs.format({
+            lookup: true,
+            stream: stream,
+            reporter: 'none',
+            level: 0
+        }).on('data', function (file) {
+            bufData = bufData.concat(file.contents);
+        }).on('end', function () {
+            let startPos = new vscode.Position(0, 0);
+            let endPos = new vscode.Position(editor.document.lineCount, 0);
+            let range = new vscode.Range(startPos, endPos);
+            let result = template[0]
+                .concat('\n<script>')
+                .concat(bufData)
+                .concat('</script>\n')
+                .concat(style[0])
+                .concat('\n')
+                .toString('utf8');
+
+            vscode.window.activeTextEditor.edit(editBuilder => {
+                editBuilder.replace(range, result);
+            });
+            console.log('complete san');
+        });
+
+
     }
     catch (err) {
         alertMsg('error', err.message);

@@ -2,7 +2,7 @@
     "name": "fecsmat",
     "displayName": "fecsmat",
     "description": "A fecs format and check extension",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "publisher": "zhanfang",
     "repository": {
         "type": "git",

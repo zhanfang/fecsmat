@@ -31,7 +31,6 @@ exports.alertMsg = alertMsg;
  */
 exports.checkEditor = function (editor, fileTypes, excludePaths) {
     if (!editor) {
-        alertMsg('warn', '无可用文本用于格式化');
         return false;
     }
 

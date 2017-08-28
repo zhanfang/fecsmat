@@ -3,7 +3,7 @@
     "displayName": "fecsmat",
     "description": "A fecs format and check extension",
     "icon": "images/fecs.jpg",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "publisher": "zhanfang",
     "engines": {
         "vscode": "^1.5.0"

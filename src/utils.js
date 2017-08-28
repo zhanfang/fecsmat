@@ -5,10 +5,7 @@
 'use strict';
 const {window} = require('vscode');
 
-/**
- * 弹窗工具
- */
-exports.alertMsg = function (type, msg) {
+function alertMsg(type, msg) {
     switch (type) {
         case 'info':
             window.showInformationMessage(msg);
@@ -22,12 +19,17 @@ exports.alertMsg = function (type, msg) {
         default:
             break;
     }
-};
+}
+
+/**
+ * 弹窗工具
+ */
+exports.alertMsg = alertMsg;
 
 /**
  * 检测当前editor是否可以被fecs应用
  */
-exports.checkEditor = function (editor, fileTypes) {
+exports.checkEditor = function (editor, fileTypes, excludePaths) {
     if (!editor) {
         alertMsg('warn', '无可用文本用于格式化');
         return false;
@@ -35,6 +37,20 @@ exports.checkEditor = function (editor, fileTypes) {
 
     const fileName = editor.document.fileName;
     const fileType = fileName.split('.').pop();
+
+    const path = excludePaths.filter(item => {
+        let reg = new RegExp(item, 'g');
+        let match = fileName.match(reg);
+        if (match) {
+            return true;
+        }
+        return false;
+    });
+
+    if (path.length >= 1) {
+        return false;
+    }
+
 
     const result = fileTypes.filter(item => {
         return item === fileType;

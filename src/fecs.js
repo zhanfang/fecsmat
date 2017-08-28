@@ -36,7 +36,7 @@ let statusBarItem = null;
 
 exports.format = function () {
     const editor = window.activeTextEditor;
-    if (checkEditor(editor, config.fileTypes)) {
+    if (checkEditor(editor, config.fileTypes, config.excludePaths)) {
         runFecsFormat(editor);
     }
 
@@ -48,15 +48,14 @@ exports.check = function (editor, context) {
         warnIconPath = context.asAbsolutePath('images/warning.svg');
     }
 
-    if (checkEditor(editor, config.fileTypes)) {
+    if (checkEditor(editor, config.fileTypes, config.excludePaths)) {
         diagnosticCollection.clear();
         runFecsCheck(editor);
     }
-
 };
 
 exports.showMsg = function (editor) {
-    if (checkEditor(editor, config.fileTypes)) {
+    if (checkEditor(editor, config.fileTypes, config.excludePaths)) {
         diagnosticCollection.clear();
         showErrorMessageInStatusBar(editor);
     }

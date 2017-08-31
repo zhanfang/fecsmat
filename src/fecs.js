@@ -59,8 +59,21 @@ exports.showMsg = function (editor) {
         diagnosticCollection.clear();
         showErrorMessageInStatusBar(editor);
     }
-
 };
+
+exports.clearMsg = function () {
+    diagnosticCollection.clear();
+    clearStatusBarMessage();
+};
+
+function clearStatusBarMessage() {
+    if (!statusBarItem) {
+        return;
+    }
+
+    statusBarItem.text = '';
+    statusBarItem.tooltip = '';
+}
 
 function runFecsCheck(editor) {
     let code = editor.document.getText();

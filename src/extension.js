@@ -5,11 +5,20 @@
 'use strict';
 
 const vscode = require('vscode');
-const {format, check, showMsg} = require('./fecs');
+const {format, check, showMsg, clearMsg} = require('./fecs');
+
+let start = false;
 
 function registerFormat(context) {
     const disposable = vscode.commands.registerCommand('extension.format', format);
+    context.subscriptions.push(disposable);
+}
 
+function registerStart(context) {
+    const disposable = vscode.commands.registerCommand('extension.start', () => {
+        start = !start;
+        clearMsg();
+    });
     context.subscriptions.push(disposable);
 }
 
@@ -23,18 +32,22 @@ function activate(context) {
     // 编辑文档后触发(coding...)
     vscode.workspace.onDidChangeTextDocument(function (event) {
         let editor = vscode.window.activeTextEditor;
-        check(editor, context);
+        if (start) {
+            check(editor, context);
+        }
     });
 
     // 切换文件 tab 后触发
     vscode.window.onDidChangeActiveTextEditor(function (editor) {
-        check(editor, context);
+        if (start) {
+            check(editor, context);
+        }
     });
 
     // 光标移动后触发
     vscode.window.onDidChangeTextEditorSelection(function (event) {
 
-        if (!event.textEditor || !event.textEditor.document) {
+        if (!event.textEditor || !event.textEditor.document || !start) {
             return;
         }
 
@@ -44,13 +57,7 @@ function activate(context) {
 
     });
 
-    vscode.window.visibleTextEditors.forEach(function (editor, i) {
-        if (editor) {
-            check(editor, context);
-        }
-
-    });
-
+    registerStart(context);
     registerFormat(context);
 }
 exports.activate = activate;

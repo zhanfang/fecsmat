@@ -89,12 +89,18 @@
             {
                 "command": "extension.format",
                 "title": "fecs format"
+            }, {
+                "command": "extension.start",
+                "title": "fecs start"
             }
         ],
         "keybindings": [
             {
                 "command": "extension.format",
                 "key": "cmd+shift+r"
+            }, {
+                "command": "extension.start",
+                "key": "cmd+shift+t"
             }
         ]
     },

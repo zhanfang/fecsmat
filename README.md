@@ -31,8 +31,14 @@ A better fecs extension for vscode. This is inspired by [vscode-fecs-plugin](htt
 
 ![vue](images/vue.png)
 
-### Fecs Format
+### Fecs Start
+Fecsmat is not start when you start vscode. If you want start fecsmat please run fllow command.
+- Run command: fecs open
+- Shortcuts: cmd+shift+t
 
+*Tip: If you want restart fecsmat, you can run command twice.*
+
+### Fecs Format
 - Run command: fecs format
 - Shortcuts: cmd+shift+r
 
